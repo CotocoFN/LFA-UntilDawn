@@ -7,11 +7,10 @@
 
        WORKING-STORAGE SECTION.
        77 wss-str-texto        pic x(500).
-       77 wss-str-acao         pic x(1) occurs 50 times.
+       77 wss-str-acao         pic x(1).
 
        77 wss-str-conjunto     pic x(50).
-       77 i pic 9(09) value 0.
-       77 j pic 9(09) value 0.
+       77 i pic 9(09).
        
 
        01 lista-de-estados             pic 9(03).
@@ -27,32 +26,14 @@
 
 
        PROCEDURE                    DIVISION.
-           display "Conjunto de instruções (0,1,2): "with no advancing.
-           accept wss-str-conjunto
-           display "...".
-           perform checa-acao.
+
            display "----Início do Jogo----".
-           initialize j.
            set est-inicio-do-jogo to true.
            perform main thru fim.
-       
-       checa-acao.
-           perform varying i from 1 by 1 until i > 50
-               add 1 to j
-               unstring wss-str-conjunto delimited by ","
-                   into wss-str-acao(j)
-                   pointer i
-               end-unstring
-               subtract 1 from i giving i
-               if (wss-str-acao(i) equal ".")
-                   exit perform
-               end-if
-           end-perform.
+           display "----Fim de Jogo----".
+
        main.
-           add 1 to j.
-           if j > 50
-               set est-morreu to true
-           end-if.
+           display wss-str-acao.
            evaluate true
                when est-inicio-do-jogo
                    go inicio-do-jogo
@@ -73,11 +54,9 @@
                when est-morreu
                    go morreu
            end-evaluate.
-
-
+           
        inicio-do-jogo.
-           display "---------------------".
-           initialize  wss-str-texto.
+           initialize wss-str-acao wss-str-texto.
            string 
            "Você está em uma mansão abandonada fugindo de um "
            "assassino. É noite e está chovendo, o que dificulta "
@@ -91,7 +70,9 @@
                into wss-str-texto
            end-string.
            display wss-str-texto.
-           evaluate wss-str-acao(j)
+           accept wss-str-acao.
+
+           evaluate wss-str-acao
                when 1
                    set est-com-machete to true
                when 0
@@ -104,8 +85,7 @@
            go main.
            
        com-machete.
-           display "---------------------".
-           initialize  wss-str-texto.
+           initialize wss-str-acao wss-str-texto.
            string
            "Você pegou a machete pois achou ser o mais seguro."
                x"0a" x"0a"
@@ -118,7 +98,8 @@
            end-string.
            display wss-str-texto.
            
-           evaluate wss-str-acao(j)
+           accept wss-str-acao.
+           evaluate wss-str-acao
                when 1
                    set est-armadilha-machete to true
                when 0
@@ -132,8 +113,7 @@
            end-evaluate.
            go main.
        sem-machete.
-           display "---------------------".
-           initialize  wss-str-texto.
+           initialize wss-str-acao wss-str-texto.
            string
            "Você decidiu que a machete poderia ser uma armadilha, "
            "ou acabaria piorando a situação. Então decide seguir o "
@@ -148,7 +128,8 @@
            end-string.
            display wss-str-texto.
            
-           evaluate wss-str-acao(j)
+          accept wss-str-acao.
+           evaluate wss-str-acao
                when 1
                    set est-assassino-ferido to true
                when 0
@@ -160,25 +141,25 @@
            end-evaluate.
            go main.
        armadilha-machete.
-           display "---------------------".
-           initialize  wss-str-texto.
+           initialize wss-str-acao wss-str-texto.
            string 
            "Ao colocar a mão no escuro, uma garra metálica salta em "
-           "você! Se trata de uma armadilha de urso." x"0a" "Por sorte,"
-           " seus reflexos conseguiram fazer com que não fosse seu "
+           "você! Se trata de uma armadilha de urso."x"0a" "Por sorte, "
+           "seus reflexos conseguiram fazer com que não fosse seu "
            "braço inteiro que ficasse preso por ela, mas sim, três "
-           "de seus dedos..." x"0a"
-           "Só lhe resta forçar com a machete para "
+           "de seus dedos... Só lhe resta forçar com a machete para "
            "abrir a armadilha, ou amputar os dedos."
                 x"0a" "O que fazer?"
                 x"0a" "1 - Forçar. | 0 - Cortar."
                into wss-str-texto
            end-string.
            display wss-str-texto.
-           initialize  wss-str-texto.
-           evaluate wss-str-acao(j)
+
+           initialize wss-str-acao wss-str-texto.
+          accept wss-str-acao.
+           evaluate wss-str-acao
                when 0
-           string x"0a"
+           string 
            "Você pega um pedaço de madeira e o morde com força "
            "Posiciona a machete contra seus dedos e toma coragem... "
            "A dor que sentiu foi indescritivel, mas você esta solto!"
@@ -187,7 +168,7 @@
            display wss-str-texto
                    set est-assassino-ferido to true 
                when 1
-           string x"0a"
+           string
                "Você conseguiu se soltar sem ficar muito ferido, "
                "mas sua machete quebrou!"
                into wss-str-texto
@@ -195,28 +176,30 @@
            display wss-str-texto
                    set est-assassino to true 
                when other
-           display
+           display 
            "Não há muito tempo para escolher, pense! Mas lembre-se:"
                    set est-armadilha-machete to true
            end-evaluate.
            go main.
        assassino.
-           display "---------------------".
-           initialize  wss-str-texto.
+           initialize wss-str-acao wss-str-texto.
            string 
            "Andando pelos corredores que mais se assemelhavam a um "
            "labirinto... "
-           "Você se encontra com o assasino!" x"0a"
-           "A machete agora seria de grande ajuda, mas ficou para trás."
+           "Você se encontra com o assasino! A machete agora "
+           "seria de grande ajuda, mas ficou para trás."
                 x"0a" "O que você escolhe?"
                 x"0a" "1 - Atacar. | 0 - Se esconder. | 2 - Correr."
                into wss-str-texto
            end-string.
            display wss-str-texto.
-           initialize  wss-str-texto.
-           evaluate wss-str-acao(j)
+
+
+           initialize wss-str-acao wss-str-texto.
+          accept wss-str-acao.
+           evaluate wss-str-acao
                when 0
-           string x"0a"
+           string
            "Você se enconde embaixo de uma grande mesa de jantar "
            "O assasino te procura mas desiste após não te encontrar... "
                into wss-str-texto
@@ -224,7 +207,7 @@
            display wss-str-texto
                    set est-sobreviveu to true
                when 1
-           string x"0a"
+           string
            "Você ataca o assasino! " 
            "Porém, seu golpe não foi forte o suficiente... "
                into wss-str-texto
@@ -232,7 +215,7 @@
            display wss-str-texto
                    set est-morreu to true
                when 2
-           string  x"0a"
+           string 
                "Você corre como se não houvesse o amanhã e "
                "despista o assasino... "
                into wss-str-texto
@@ -245,8 +228,8 @@
            end-evaluate.
            go main.
        assassino-machete.
-           display "---------------------".
-           initialize  wss-str-texto.
+           
+           initialize wss-str-acao wss-str-texto.
            string 
            "Andando pelos corredores que mais se assemelhavam "
            "a um labirinto... "
@@ -257,18 +240,20 @@
            end-string.
            display wss-str-texto.
 
-           initialize  wss-str-texto.
-           evaluate wss-str-acao(j)
+
+           initialize wss-str-acao wss-str-texto.
+          accept wss-str-acao.
+           evaluate wss-str-acao
                when 0
-           string  x"0a"
-           "Você se enconde embaixo de uma grande mesa de jantar, "
+           string 
+           "Você se enconde embaixo de uma grande mesa de jantar,"
            "porém a sua machete cai no chão e o assasino te encontra!"
                into wss-str-texto
            end-string
            display wss-str-texto
                    set est-morreu to true
                when 1
-           string x"0a"
+           string
            "Você ataca o assasino! " x"0a"
            "O ataque deixa o assasino ferido e você corre para a saída."
                into wss-str-texto
@@ -276,7 +261,7 @@
            display wss-str-texto
                    set est-sobreviveu to true
                when 2
-           string  x"0a"
+           string 
            "Você corre como se não houvesse o amanhã e despista "
            "o assasino... "
                into wss-str-texto
@@ -289,10 +274,11 @@
            end-evaluate.
            go main.
        assassino-ferido.
-           display "---------------------".
-           initialize  wss-str-texto.
+           
+           initialize wss-str-acao wss-str-texto.
            string 
            "Após se soltar da armadilha você segue a busca pela saida."
+           x"0a"
            "Andando pelos corredores que mais se assemelhavam a um "
            "labirinto..." x"0a"
            "Você se encontra com o assassino, mas voce está ferido!"
@@ -301,11 +287,13 @@
                into wss-str-texto
            end-string.
            display wss-str-texto.
-           initialize  wss-str-texto.
-           evaluate wss-str-acao(j)
+
+           initialize wss-str-acao wss-str-texto.
+          accept wss-str-acao.
+           evaluate wss-str-acao
                when 0
-           string  x"0a"
-           "Você se enconde embaixo de uma grande mesa de jantar."
+           string 
+           "Você se enconde embaixo de uma grande mesa de jantar "
            "Porém seu sangue cria um rastro no chão e o assasino "
            "te encontra..."
                into wss-str-texto
@@ -313,7 +301,7 @@
            display wss-str-texto
                    set est-morreu to true
                when 1
-           string  x"0a"
+           string 
            "Mesmo ferido você ataca o assasino! "
            "O assassino te subjulgou pelo seu ferimento e você o pega "
            "de surpresa, o ferindo fortmente..."
@@ -322,8 +310,8 @@
            display wss-str-texto
                    set est-sobreviveu to true
                when 2
-           string  x"0a"
-           "Você corre como se não houvesse o amanhã..."
+           string 
+           "Você corre como se não houvesse o amanhã "
            "Porém, seus ferimentos te deixaram exauto e o assasino te "
            "alcança... "
                into wss-str-texto
@@ -331,17 +319,17 @@
            display wss-str-texto
                    set est-morreu to true
                when other
-                   display "Não há muito tempo para escolher, pense!"
+                   display
+               "Não há muito tempo para escolher, pense!"
                    set est-assassino-ferido to true
            end-evaluate.
            go main.
        sobreviveu.
-           display "---------------------".
            display x"0a" "Você conseguiu escapar e sobreviveu! :D".
-           go to fim.
+           go fim.
        morreu.
-           display "---------------------".
            display x"0a" "O assasino te pegou e você morreu! :(".
-           go to fim.
+           go fim.
+
        fim.
            stop run.
