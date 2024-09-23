@@ -44,7 +44,8 @@
            end-perform.
        main.
            add 1 to j.
-           if j > 50
+           display "AAAAAAAAAAAAAAAAAA " wss-str-acao(j)
+           if j > 10
                set est-morreu to true
            end-if.
            evaluate true
